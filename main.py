@@ -671,7 +671,17 @@ async def main(page: ft.Page):
 
     foreground = ft.Column([header, input_row, status_row, cards_scroll], spacing=0, expand=True)
 
-    root = ft.Stack([_build_background(), foreground], expand=True)
+    discord_btn = ft.Container(
+        content=ft.IconButton(
+            content=ft.Image(src="discord.png", width=24, height=24),
+            on_click=lambda _: page.launch_url("https://discord.gg/larpsense"),
+            tooltip="Join our Discord Server",
+        ),
+        bottom=15,
+        right=20,
+    )
+
+    root = ft.Stack([_build_background(), foreground, discord_btn], expand=True)
 
     page.add(root)
     render_cards()
