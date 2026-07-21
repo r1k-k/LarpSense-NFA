@@ -1,0 +1,8 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Kompilacja i buildy
+build/
+dist/
+*.spec
