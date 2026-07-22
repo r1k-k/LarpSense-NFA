@@ -551,6 +551,7 @@ async def main(page: ft.Page):
         actions_row = ft.Row(
             [
                 login_button,
+                ft.IconButton(icon=ft.Icons.EDIT_ROUNDED, icon_color=TXT2, icon_size=17, tooltip="Set Alias", on_click=open_alias_dialog),
                 ft.IconButton(icon=ft.Icons.SECURITY_UPDATE_GOOD_OUTLINED, icon_color=TXT2, icon_size=17, tooltip="Verify Token", on_click=on_verify),
                 ft.IconButton(icon=ft.Icons.SCHEDULE_ROUNDED, icon_color=TXT2, icon_size=17, tooltip="Set cooldown", on_click=open_cooldown_dialog),
                 ft.IconButton(icon=ft.Icons.DELETE_OUTLINE, icon_color=RED_ERR, icon_size=17, tooltip="Remove", on_click=on_remove),
@@ -576,13 +577,7 @@ async def main(page: ft.Page):
                             avatar_stack,
                             ft.Column(
                                 [
-                                    ft.Row(
-                                        [
-                                            ft.Text(display_name, size=15, weight=ft.FontWeight.BOLD, color=TXT, max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
-                                            ft.IconButton(icon=ft.Icons.EDIT_ROUNDED, icon_color=TXT2, icon_size=14, tooltip="Set Alias", on_click=open_alias_dialog, padding=0, width=22, height=22)
-                                        ],
-                                        spacing=6, tight=True
-                                    ),
+                                    ft.Text(display_name, size=15, weight=ft.FontWeight.BOLD, color=TXT, max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
                                     ft.Text(steam_id, size=11, color=TXT2, font_family="Consolas", selectable=True),
                                     ft.Row(
                                         [
