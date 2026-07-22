@@ -1,4 +1,7 @@
 import asyncio
+import threading
+from PIL import Image
+import pystray
 import time
 import os
 import sys
@@ -220,10 +223,95 @@ async def main(page: ft.Page):
     page.window.height = 820
     page.window.min_width = 800
     page.window.min_height = 600
+    page.window.prevent_close = True
     await page.window.center()
 
     loop = asyncio.get_running_loop()
     accounts = await loop.run_in_executor(None, backend.load_accounts)
+
+    def on_minimize_tray(e):
+        page.window.visible = False
+        close_dialog.open = False
+        page.update()
+        start_tray_icon()
+
+    async def on_exit(e):
+        await page.window.destroy()
+    
+    def on_cancel_close(e):
+        close_dialog.open = False
+        page.update()
+
+    close_dialog = ft.AlertDialog(
+        title=ft.Text("Close Application?", color=TITLE_TXT, weight=ft.FontWeight.BOLD),
+        content=ft.Text("Do you want to minimize the application to the system tray so it runs in the background, or exit completely?", color=TXT),
+        actions=[
+            ft.TextButton("Cancel", on_click=on_cancel_close, style=ft.ButtonStyle(color=TXT2)),
+            ft.ElevatedButton("Minimize to Tray", on_click=on_minimize_tray, bgcolor=GREEN, color=BG),
+            ft.TextButton("Exit Application", on_click=on_exit, style=ft.ButtonStyle(color=RED_ERR)),
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+        bgcolor=PANEL, shape=ft.RoundedRectangleBorder(radius=10)
+    )
+    page.overlay.append(close_dialog)
+
+    def window_event(e):
+        if getattr(e, "type", None) == ft.WindowEventType.CLOSE or getattr(e, "data", "") == "close":
+            close_dialog.open = True
+            page.update()
+
+    page.window.on_event = window_event
+
+    tray_icon = None
+
+    def start_tray_icon():
+        nonlocal tray_icon
+        if tray_icon is not None:
+            return
+
+        def on_show(icon, item):
+            icon.stop()
+            nonlocal tray_icon
+            tray_icon = None
+            page.window.visible = True
+            page.update()
+
+        def on_quit(icon, item):
+            icon.stop()
+            async def kill_app():
+                await page.window.destroy()
+                os._exit(0)
+            page.run_task(kill_app)
+        
+        def make_login_action(acc):
+            def action(icon, item):
+                # Login directly from backend without UI blocking
+                backend.do_login(acc.get("username", ""), acc.get("token", ""))
+            return action
+
+        account_items = []
+        for acc in accounts:
+            name = resolve_display_name(acc)
+            if acc.get("alias"):
+                name = f"[{acc['alias']}] {name}"
+            account_items.append(pystray.MenuItem(name, make_login_action(acc)))
+        
+        if not account_items:
+            account_items.append(pystray.MenuItem("No accounts saved", None, enabled=False))
+
+        menu = pystray.Menu(
+            pystray.MenuItem("Show LarpSense NFA", on_show, default=True),
+            pystray.MenuItem("Log In", pystray.Menu(*account_items)),
+            pystray.MenuItem("Exit", on_quit)
+        )
+
+        try:
+            image = Image.open(LOGO_PATH)
+        except Exception:
+            image = Image.new('RGB', (64, 64), color='green')
+
+        tray_icon = pystray.Icon("LarpSense", image, "LarpSense NFA Tool", menu)
+        threading.Thread(target=tray_icon.run, daemon=True).start()
 
     cooldown_text_refs: list[tuple[ft.Text, dict]] = []
 
