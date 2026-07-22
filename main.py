@@ -13,7 +13,7 @@ import urllib.request
 import json
 
 APP_TITLE = "LarpSense NFA Tool"
-CURRENT_VERSION = "v1.0.0"
+CURRENT_VERSION = "v1.1.0"
 
 # ============================================================
 #  Color Palette (Cosmic Larpsense UI)
