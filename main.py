@@ -123,8 +123,6 @@ def cooldown_display(acc: dict) -> tuple[str, str]:
     return "No cooldown", TEXT_MUTED
 
 def resolve_display_name(acc: dict) -> str:
-    alias = acc.get("alias")
-    if alias: return alias
     persona = acc.get("persona") or acc.get("_persona_cache")
     if persona: return persona
     steam_id = acc.get("steamId") or acc.get("steam_id") or ""
@@ -623,6 +621,17 @@ async def main(page: ft.Page):
         )
                 
         card_stack_children = [card_gesture]
+        if acc.get("alias"):
+            alias_badge = ft.Container(
+                content=ft.Row([ft.Icon(ft.Icons.LABEL_ROUNDED, size=11, color=BG), ft.Text(acc["alias"].upper(), size=10, weight=ft.FontWeight.BOLD, color=BG)], spacing=3, tight=True),
+                bgcolor=GREEN,
+                padding=ft.Padding.symmetric(horizontal=10, vertical=3),
+                border_radius=ft.BorderRadius(top_left=0, top_right=0, bottom_left=8, bottom_right=8),
+                shadow=ft.BoxShadow(blur_radius=6, spread_radius=0, color=ft.Colors.with_opacity(0.4, GREEN), offset=ft.Offset(0, 2))
+            )
+            alias_badge_wrapper = ft.Row([alias_badge], alignment=ft.MainAxisAlignment.CENTER, top=0, left=0, right=0)
+            card_stack_children.append(alias_badge_wrapper)
+
         if is_prime:
             prime_badge = ft.Container(
                 content=ft.Row([ft.Icon(ft.Icons.STAR_ROUNDED, size=12, color="#000000"), ft.Text("PRIME", size=10, weight=ft.FontWeight.BOLD, color="#000000")], spacing=2, tight=True),
