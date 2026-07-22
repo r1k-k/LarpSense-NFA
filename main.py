@@ -600,7 +600,7 @@ async def main(page: ft.Page):
             bgcolor=CARD_BG,
             border=ft.Border.all(1, BORDER),
             border_radius=14,
-            padding=16,
+            padding=ft.Padding(left=16, top=26, right=16, bottom=16),
             shadow=[_lift_shadow()],
             animate=ft.Animation(150),
         )
@@ -624,10 +624,10 @@ async def main(page: ft.Page):
         if acc.get("alias"):
             alias_badge = ft.Container(
                 content=ft.Row([ft.Icon(ft.Icons.LABEL_ROUNDED, size=11, color=BG), ft.Text(acc["alias"].upper(), size=10, weight=ft.FontWeight.BOLD, color=BG)], spacing=3, tight=True),
-                bgcolor=GREEN,
+                bgcolor="#eef2f6",
                 padding=ft.Padding.symmetric(horizontal=10, vertical=3),
                 border_radius=ft.BorderRadius(top_left=0, top_right=0, bottom_left=8, bottom_right=8),
-                shadow=ft.BoxShadow(blur_radius=6, spread_radius=0, color=ft.Colors.with_opacity(0.4, GREEN), offset=ft.Offset(0, 2))
+                shadow=ft.BoxShadow(blur_radius=6, spread_radius=0, color=ft.Colors.with_opacity(0.15, "#eef2f6"), offset=ft.Offset(0, 2))
             )
             alias_badge_wrapper = ft.Row([alias_badge], alignment=ft.MainAxisAlignment.CENTER, top=0, left=0, right=0)
             card_stack_children.append(alias_badge_wrapper)
