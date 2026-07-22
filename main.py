@@ -6,7 +6,11 @@ import flet as ft
 import random
 import steam_backend as backend
 
+import urllib.request
+import json
+
 APP_TITLE = "LarpSense NFA"
+CURRENT_VERSION = "v0.9.0" # Simulated old version for testing
 
 # ============================================================
 #  Color Palette (Cosmic Larpsense UI)
@@ -659,6 +663,39 @@ async def main(page: ft.Page):
         padding=ft.Padding.symmetric(horizontal=22, vertical=20),
     )
 
+    update_btn = ft.Container(
+        content=ft.ElevatedButton(
+            "UPDATE AVAILABLE",
+            icon=ft.Icons.DOWNLOAD_ROUNDED,
+            color=BG,
+            bgcolor=GREEN,
+            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=8)),
+            on_click=lambda _: webbrowser.open("https://github.com/r1k-k/LarpSense-NFA/releases/latest"),
+        ),
+        visible=False, # Hidden by default
+    )
+    
+    def check_for_updates():
+        try:
+            req = urllib.request.Request(
+                "https://api.github.com/repos/r1k-k/LarpSense-NFA/releases/latest",
+                headers={"User-Agent": "LarpSense-Updater"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as r:
+                data = json.loads(r.read().decode())
+                latest_version = data.get("tag_name", "")
+                
+                # Simple string comparison for versions like "v1.0.1" > "v1.0.0"
+                if latest_version and latest_version > CURRENT_VERSION:
+                    update_btn.visible = True
+                    update_btn.content.text = f"UPDATE TO {latest_version}"
+                    page.update()
+        except Exception as e:
+            print(f"Update check failed: {e}")
+
+    # Inject update button into header
+    header.content.controls.insert(3, update_btn)
+
     input_row = ft.Container(
         content=ft.Row([input_glow_wrap, verify_button, add_btn_container], spacing=10),
         padding=ft.Padding.symmetric(horizontal=22, vertical=16),
@@ -689,6 +726,9 @@ async def main(page: ft.Page):
     render_cards()
     
     page.run_task(cooldown_ticker)
+    
+    import threading
+    threading.Thread(target=check_for_updates, daemon=True).start()
 
 if __name__ == "__main__":
     ft.app(target=main, assets_dir=get_resource_path("assets"))
