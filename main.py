@@ -461,7 +461,7 @@ async def main(page: ft.Page):
                 alias_dialog.open = False
                 page.update()
 
-            alias_input = ft.TextField(label="Custom Alias", value=acc.get("alias", ""), width=280, bgcolor=INPUT_BG, border_color=BORDER, text_size=14, focused_border_color=GREEN, cursor_color=GREEN, color=TXT)
+            alias_input = ft.TextField(label="Custom Alias", value=acc.get("alias", ""), width=280, max_length=25, bgcolor=INPUT_BG, border_color=BORDER, text_size=14, focused_border_color=GREEN, cursor_color=GREEN, color=TXT)
             alias_dialog = ft.AlertDialog(
                 title=ft.Text("Set Account Alias", color=TITLE_TXT, size=16, weight=ft.FontWeight.BOLD),
                 content=ft.Container(content=alias_input, padding=10),
@@ -624,10 +624,10 @@ async def main(page: ft.Page):
         if acc.get("alias"):
             alias_badge = ft.Container(
                 content=ft.Row([ft.Icon(ft.Icons.LABEL_ROUNDED, size=11, color=BG), ft.Text(acc["alias"].upper(), size=10, weight=ft.FontWeight.BOLD, color=BG)], spacing=3, tight=True),
-                bgcolor="#eef2f6",
+                bgcolor="#00e5ff",
                 padding=ft.Padding.symmetric(horizontal=10, vertical=3),
                 border_radius=ft.BorderRadius(top_left=0, top_right=0, bottom_left=8, bottom_right=8),
-                shadow=ft.BoxShadow(blur_radius=6, spread_radius=0, color=ft.Colors.with_opacity(0.15, "#eef2f6"), offset=ft.Offset(0, 2))
+                shadow=ft.BoxShadow(blur_radius=6, spread_radius=0, color=ft.Colors.with_opacity(0.15, "#00e5ff"), offset=ft.Offset(0, 2))
             )
             alias_badge_wrapper = ft.Row([alias_badge], alignment=ft.MainAxisAlignment.CENTER, top=0, left=0, right=0)
             card_stack_children.append(alias_badge_wrapper)
