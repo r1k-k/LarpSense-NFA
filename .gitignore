@@ -2,7 +2,19 @@
 __pycache__/
 *.pyc
 
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
 # Kompilacja i buildy
 build/
 dist/
 *.spec
+
+# IDEs
+.vscode/
+.idea/
