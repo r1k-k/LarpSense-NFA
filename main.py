@@ -9,7 +9,7 @@ import steam_backend as backend
 import urllib.request
 import json
 
-APP_TITLE = "LarpSense NFA"
+APP_TITLE = "LarpSense NFA Tool"
 CURRENT_VERSION = "v1.0.0"
 
 # ============================================================
@@ -643,7 +643,7 @@ async def main(page: ft.Page):
                 ft.Column(
                     [
                         ft.Text(APP_TITLE, size=22, weight=ft.FontWeight.BOLD, color=TITLE_TXT),
-                        ft.Text("Steam Account Manager", size=12, color=TXT2),
+                        ft.Text("Steam NFA Manager", size=12, color=TXT2),
                     ],
                     spacing=0,
                 ),
