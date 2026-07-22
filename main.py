@@ -10,7 +10,7 @@ import urllib.request
 import json
 
 APP_TITLE = "LarpSense NFA"
-CURRENT_VERSION = "v0.9.0" # Simulated old version for testing
+CURRENT_VERSION = "v1.0.0"
 
 # ============================================================
 #  Color Palette (Cosmic Larpsense UI)
