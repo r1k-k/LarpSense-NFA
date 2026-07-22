@@ -123,6 +123,8 @@ def cooldown_display(acc: dict) -> tuple[str, str]:
     return "No cooldown", TEXT_MUTED
 
 def resolve_display_name(acc: dict) -> str:
+    alias = acc.get("alias")
+    if alias: return alias
     persona = acc.get("persona") or acc.get("_persona_cache")
     if persona: return persona
     steam_id = acc.get("steamId") or acc.get("steam_id") or ""
@@ -438,6 +440,45 @@ async def main(page: ft.Page):
             except Exception as ex:
                 set_status(f"Error removing account: {ex}", RED_ERR)
 
+        def open_alias_dialog(e, acc=acc):
+            def on_save(ex):
+                val = alias_input.value.strip()
+                if val:
+                    acc["alias"] = val
+                else:
+                    acc.pop("alias", None)
+                backend.save_accounts(accounts)
+                render_cards()
+                alias_dialog.open = False
+                page.update()
+            
+            def on_clear(ex):
+                acc.pop("alias", None)
+                backend.save_accounts(accounts)
+                render_cards()
+                alias_dialog.open = False
+                page.update()
+
+            def on_cancel(ex):
+                alias_dialog.open = False
+                page.update()
+
+            alias_input = ft.TextField(label="Custom Alias", value=acc.get("alias", ""), width=280, bgcolor=INPUT_BG, border_color=BORDER, text_size=14, focused_border_color=GREEN, cursor_color=GREEN, color=TXT)
+            alias_dialog = ft.AlertDialog(
+                title=ft.Text("Set Account Alias", color=TITLE_TXT, size=16, weight=ft.FontWeight.BOLD),
+                content=ft.Container(content=alias_input, padding=10),
+                actions=[
+                    ft.TextButton("Clear", on_click=on_clear, style=ft.ButtonStyle(color=RED_ERR)),
+                    ft.TextButton("Cancel", on_click=on_cancel, style=ft.ButtonStyle(color=TXT2)),
+                    ft.ElevatedButton("Save", bgcolor=GREEN, color=BG, on_click=on_save),
+                ],
+                actions_alignment=ft.MainAxisAlignment.END,
+                bgcolor=PANEL, shape=ft.RoundedRectangleBorder(radius=10)
+            )
+            page.overlay.append(alias_dialog)
+            alias_dialog.open = True
+            page.update()
+
         def open_cooldown_dialog(e, acc=acc):
             def on_select(note_value):
                 acc["note"] = note_value
@@ -535,7 +576,13 @@ async def main(page: ft.Page):
                             avatar_stack,
                             ft.Column(
                                 [
-                                    ft.Text(display_name, size=15, weight=ft.FontWeight.BOLD, color=TXT, max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
+                                    ft.Row(
+                                        [
+                                            ft.Text(display_name, size=15, weight=ft.FontWeight.BOLD, color=TXT, max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
+                                            ft.IconButton(icon=ft.Icons.EDIT_ROUNDED, icon_color=TXT2, icon_size=14, tooltip="Set Alias", on_click=open_alias_dialog, padding=0, width=22, height=22)
+                                        ],
+                                        spacing=6, tight=True
+                                    ),
                                     ft.Text(steam_id, size=11, color=TXT2, font_family="Consolas", selectable=True),
                                     ft.Row(
                                         [
@@ -643,7 +690,7 @@ async def main(page: ft.Page):
                 ft.Column(
                     [
                         ft.Text(APP_TITLE, size=22, weight=ft.FontWeight.BOLD, color=TITLE_TXT),
-                        ft.Text("Steam NFA Manager", size=12, color=TXT2),
+                        ft.Text("Steam Non-Full-Access Manager", size=12, color=TXT2),
                     ],
                     spacing=0,
                 ),
